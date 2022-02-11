@@ -1,0 +1,47 @@
+{
+  "name": "react-native-imglysdk",
+  "title": "React Native module for IMG.LY SDK",
+  "version": "2.12.0",
+  "description": "A React Native base module for PhotoEditor SDK and VideoEditor SDK. Integrate the video- and photo editor into your own HTML5, iOS or Android app - in minutes!",
+  "main": "app.plugin.js",
+  "scripts": {
+    "build": "expo-module build plugin",
+    "clean": "expo-module clean plugin",
+    "prepare": "yarn clean && yarn build"
+  },
+  "homepage": "https://www.img.ly",
+  "keywords": [
+    "react-native",
+    "video",
+    "video editor",
+    "videoeditor",
+    "videoeditorsdk",
+    "VideoEditor SDK",
+    "photo",
+    "photo editor",
+    "photoeditor",
+    "photoeditorsdk",
+    "PhotoEditor SDK",
+    "imgly",
+    "img.ly",
+    "imglysdk",
+    "imgly sdk",
+    "img.ly sdk",
+    "SDK",
+    "ios",
+    "android"
+  ],
+  "author": {
+    "name": "img.ly GmbH",
+    "email": "contact@img.ly"
+  },
+  "license": "BSD-3-Clause",
+  "licenseFilename": "LICENSE.md",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "expo-module-scripts": "^2.0.0"
+  },
+  "dependencies": {
+    "@expo/config-plugins": "^4.0.9"
+  }
+}
