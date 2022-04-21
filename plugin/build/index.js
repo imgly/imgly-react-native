@@ -24,46 +24,40 @@ const Constants = __importStar(require("./constants"));
 const Helpers = __importStar(require("./helpers"));
 /** Applies all needed native configurations. */
 const withReactNativeIMGLY = (config, { android } = {}) => {
+    const configuration = {
+        version: android === null || android === void 0 ? void 0 : android.version,
+        modules: android === null || android === void 0 ? void 0 : android.modules,
+        buildToolsVersion: android === null || android === void 0 ? void 0 : android.buildToolsVersion,
+        minSdkVersion: android === null || android === void 0 ? void 0 : android.minSdkVersion,
+        compileSdkVersion: android === null || android === void 0 ? void 0 : android.compileSdkVersion,
+        targetSdkVersion: android === null || android === void 0 ? void 0 : android.targetSdkVersion,
+        kotlinGradlePluginVersion: android === null || android === void 0 ? void 0 : android.kotlinGradlePluginVersion,
+    };
     return (0, config_plugins_1.withPlugins)(config, [
-        withMultidexApplication,
-        withMultidexGradle,
-        [withIMGLYGradle, { androidVersion: android === null || android === void 0 ? void 0 : android.version }],
-        [withIMGLYConfig, { includedModules: android === null || android === void 0 ? void 0 : android.modules }],
+        [withIMGLYGradle, { configuration: configuration }],
+        [withIMGLYConfig, { configuration: configuration }],
     ]);
 };
-/** Implements multidex in the `MainApplication.java`. */
-const withMultidexApplication = (config) => {
-    return (0, config_plugins_1.withMainApplication)(config, (config) => {
-        config.modResults.contents = addMultidexApplication(config.modResults.contents);
-        return config;
-    });
-};
-/** Implements multidex in the `android/build.gradle`. */
-const withMultidexGradle = (config) => {
-    return (0, config_plugins_1.withAppBuildGradle)(config, (config) => {
-        config.modResults.contents = addMultidexGradle(config.modResults.contents);
-        return config;
-    });
-};
 /** Adds the imgly repos in the `android/build.gradle`. */
-const withIMGLYGradle = (config, { androidVersion }) => {
+const withIMGLYGradle = (config, { configuration }) => {
     return (0, config_plugins_1.withProjectBuildGradle)(config, (config) => {
-        config.modResults.contents = addIMGLYRepos(config.modResults.contents, androidVersion);
+        config.modResults.contents = addIMGLYRepos(config.modResults.contents, configuration);
         return config;
     });
 };
 /** Adds the imgly modules in the `android/app/build.gradle`. */
-const withIMGLYConfig = (config, { includedModules }) => {
+const withIMGLYConfig = (config, { configuration }) => {
     return (0, config_plugins_1.withAppBuildGradle)(config, (config) => {
-        config.modResults.contents = addIMGLYConfig(config.modResults.contents, includedModules);
+        config.modResults.contents = addIMGLYConfig(config.modResults.contents, configuration);
         return config;
     });
 };
 /** Adds the imgly repos in the `android/build.gradle`. */
-function addIMGLYRepos(contents, androidVersion) {
+function addIMGLYRepos(contents, configuration) {
+    var _a;
     var modifiedContents = contents;
     const repos_tag = Constants.ConfigurationTag.Repos;
-    const repos_replacement = Constants.replacementForTag(repos_tag, androidVersion);
+    const repos_replacement = Constants.replacementForTag(repos_tag, configuration);
     const repos_taggedReplacement = Helpers.replaceTaggedConfiguration(modifiedContents, Constants.ConfigurationTag.Repos, repos_replacement);
     if (repos_taggedReplacement != null) {
         modifiedContents = repos_taggedReplacement;
@@ -86,12 +80,28 @@ function addIMGLYRepos(contents, androidVersion) {
             modifiedContents = modifiedContents.concat(maven_tagged_replacement_block);
         }
     }
+    const sdk_versions_tag = Constants.ConfigurationTag.SDKVersions;
+    const versions_replacement = Constants.replacementForTag(sdk_versions_tag, configuration, contents);
+    const versions_tagged_replacement = Helpers.replaceTaggedConfiguration(modifiedContents, sdk_versions_tag, versions_replacement);
+    if (versions_tagged_replacement != null) {
+        modifiedContents = versions_tagged_replacement;
+    }
+    else {
+        const previousContent = (_a = Helpers.previousContent(sdk_versions_tag, contents)) === null || _a === void 0 ? void 0 : _a.replace(/^/gm, "//");
+        if (previousContent != null) {
+            const versions_tagged_replacement_block = Helpers.taggedReplacementBlock(sdk_versions_tag, versions_replacement, previousContent);
+            if (!contents.match(versions_tagged_replacement_block)) {
+                const versionsRegex = /(^[\s]*)\bext\s*{([^}]*)}$/gm;
+                modifiedContents = modifiedContents.replace(versionsRegex, versions_tagged_replacement_block);
+            }
+        }
+    }
     return modifiedContents;
 }
 /** Adds the imgly modules in the `android/app/build.gradle`. */
-function addIMGLYConfig(contents, includedModules) {
+function addIMGLYConfig(contents, configuration) {
     const tag = Constants.ConfigurationTag.Modules;
-    const replacement = Constants.replacementForTag(tag, includedModules);
+    const replacement = Constants.replacementForTag(tag, configuration);
     const taggedReplacement = Helpers.replaceTaggedConfiguration(contents, tag, replacement);
     if (taggedReplacement != null) {
         return taggedReplacement;
@@ -103,29 +113,6 @@ function addIMGLYConfig(contents, includedModules) {
                 return contents.replace(Constants.imgly_config_regex, Constants.imgly_config_regex + replacement_block);
             }
             throw new Error('Unable to configure img.ly plugins: Plugin "com.android.application" not found.');
-        }
-        return contents;
-    }
-}
-/** Implements multidex in the `MainApplication.java`. */
-function addMultidexApplication(contents) {
-    if (contents.match(Constants.multidex)) {
-        return contents.replace(Constants.multidex, Constants.replacementForTag(Constants.ConfigurationTag.Multidex));
-    }
-    return contents;
-}
-/** Implements multidex in the `android/build.gradle`. */
-function addMultidexGradle(contents) {
-    const tag = Constants.ConfigurationTag.MultidexConfig;
-    const replacement = Constants.replacementForTag(tag);
-    const taggedReplacementBlock = Helpers.taggedConfigurationBlock(tag, replacement);
-    const taggedReplacement = Helpers.replaceTaggedConfiguration(contents, tag, replacement);
-    if (taggedReplacement != null) {
-        return taggedReplacement;
-    }
-    else {
-        if (!contents.match(taggedReplacementBlock)) {
-            return contents.concat(taggedReplacementBlock);
         }
         return contents;
     }

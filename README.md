@@ -39,7 +39,7 @@ In order to use this module with the Expo CLI you can make use of our integrated
    }
    ```
 
-   If needed, you can also use a specific version of our native library for Android as well as define explicitly the included modules. By default, all modules for both PhotoEditor SDK and VideoEditor SDK are included.
+   If needed, you can also use a specific version of our native library for Android as well as define explicitly the included modules. By default, all modules for both PhotoEditor SDK and VideoEditor SDK are included. Furthermore, you can configure the `buildToolsVersion`, `minSdkVersion`, `compileSdkVersion`, `targetSdkVersion`, and `kotlinGradlePluginVersion`.
 
    ```json
    {
@@ -48,13 +48,18 @@ In order to use this module with the Expo CLI you can make use of our integrated
          "react-native-imglysdk",
          {
            "android": {
-             "version": "9.2.0",
+             "version": "10.0.1",
              "modules": [
                "ui:core",
                "ui:transform",
                "ui:filter",
                "assets:filter-basic"
-             ]
+             ],
+             "buildToolsVersion": "31.0.0",
+             "minSdkVersion": "21",
+             "compileSdkVersion": "31",
+             "targetSdkVersion": "30",
+             "kotlinGradlePluginVersion": "1.5.32"
            }
          }
        ]
