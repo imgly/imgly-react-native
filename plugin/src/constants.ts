@@ -90,7 +90,7 @@ function customizedModules(configuration?: AndroidConfigurationObject): string {
 export const imgly_config_regex = 'apply plugin: "com.android.application"';
 
 /** The version of the native Android SDK that is needed for the plugins. */
-const sdk_version = "10.0.1";
+const sdk_version = "10.1.1";
 
 /** The Kotlin version that is needed for the plugins. */
 const default_kotlin_version = "1.5.32";
@@ -132,6 +132,7 @@ imglyConfig {
         include 'ui:video-library'
         include 'ui:video-composition'
         include 'ui:audio-composition'
+        include 'ui:giphy-sticker'
 
         // This module is big, remove the serializer if you don't need that feature.
         include 'backend:serializer'
