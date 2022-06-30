@@ -148,6 +148,7 @@ imglyConfig {
 
         include 'backend:sticker-animated'
         include 'backend:sticker-smart'
+        include 'backend:background-removal'
     }
 }
 `;
