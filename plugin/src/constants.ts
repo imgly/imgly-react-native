@@ -78,7 +78,9 @@ export function replacementForTag(
  */
 function customizedModules(configuration?: AndroidConfigurationObject): string {
   if (configuration?.modules != null) {
-    var modules = configuration.modules.flatMap((module) => `        include '${module}'\n`);
+    var modules = configuration.modules.flatMap(
+      (module) => `        include '${module}'\n`
+    );
     var config = imgly_config_start.concat(...modules, imgly_config_end);
     return config;
   } else {
@@ -90,7 +92,7 @@ function customizedModules(configuration?: AndroidConfigurationObject): string {
 export const imgly_config_regex = 'apply plugin: "com.android.application"';
 
 /** The version of the native Android SDK that is needed for the plugins. */
-const sdk_version = "10.1.1";
+const sdk_version = "10.4.0";
 
 /** The Kotlin version that is needed for the plugins. */
 const default_kotlin_version = "1.5.32";
@@ -169,8 +171,12 @@ function imgly_repos_block(configuration?: AndroidConfigurationObject): string {
         maven { url "https://artifactory.img.ly/artifactory/imgly" }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${configuration?.kotlinGradlePluginVersion ?? default_kotlin_version}"
-        classpath 'ly.img.android.sdk:plugin:${configuration?.version ?? sdk_version}'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${
+          configuration?.kotlinGradlePluginVersion ?? default_kotlin_version
+        }"
+        classpath 'ly.img.android.sdk:plugin:${
+          configuration?.version ?? sdk_version
+        }'
     }
 }
 `;
