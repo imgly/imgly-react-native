@@ -48,7 +48,7 @@ In order to use this module with the Expo CLI you can make use of our integrated
          "react-native-imglysdk",
          {
            "android": {
-             "version": "10.4.0",
+             "version": "10.4.1",
              "modules": [
                "ui:core",
                "ui:transform",

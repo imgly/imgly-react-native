@@ -92,7 +92,7 @@ function customizedModules(configuration?: AndroidConfigurationObject): string {
 export const imgly_config_regex = 'apply plugin: "com.android.application"';
 
 /** The version of the native Android SDK that is needed for the plugins. */
-const sdk_version = "10.4.0";
+const sdk_version = "10.4.1";
 
 /** The Kotlin version that is needed for the plugins. */
 const default_kotlin_version = "1.5.32";
