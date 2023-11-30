@@ -1,7 +1,7 @@
 {
   "name": "react-native-imglysdk",
   "title": "React Native module for IMG.LY SDK",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "A React Native base module for PhotoEditor SDK and VideoEditor SDK. Integrate the video- and photo editor into your own HTML5, iOS or Android app - in minutes!",
   "main": "app.plugin.js",
   "scripts": {
