@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -28,7 +32,7 @@ var ConfigurationTag;
     ConfigurationTag["Repos"] = "REPOS";
     ConfigurationTag["Maven"] = "MAVEN";
     ConfigurationTag["SDKVersions"] = "SDK_VERSIONS";
-})(ConfigurationTag = exports.ConfigurationTag || (exports.ConfigurationTag = {}));
+})(ConfigurationTag || (exports.ConfigurationTag = ConfigurationTag = {}));
 /** The default `buildToolsVersion`. */
 exports.defaultBuildToolsVersion = "31.0.0";
 /** The default `minSdkVersion`. */
@@ -45,7 +49,6 @@ exports.defaultTargetSdkVersion = "30";
  * @returns The replacement string.
  */
 function replacementForTag(tag, configuration, content) {
-    var _a;
     switch (tag) {
         case ConfigurationTag.Maven:
             return imgly_allprojects_block;
@@ -55,7 +58,7 @@ function replacementForTag(tag, configuration, content) {
             return imgly_repos_block(configuration);
         case ConfigurationTag.SDKVersions:
             if (content != null) {
-                return (_a = Helpers.parseSDKVersions(content, configuration)) !== null && _a !== void 0 ? _a : "";
+                return Helpers.parseSDKVersions(content, configuration) ?? "";
             }
             return "";
     }
@@ -67,7 +70,7 @@ exports.replacementForTag = replacementForTag;
  * @returns The parsed string.
  */
 function customizedModules(configuration) {
-    if ((configuration === null || configuration === void 0 ? void 0 : configuration.modules) != null) {
+    if (configuration?.modules != null) {
         var modules = configuration.modules.flatMap((module) => `        include '${module}'\n`);
         var config = imgly_config_start.concat(...modules, imgly_config_end);
         return config;
@@ -147,14 +150,13 @@ allprojects {
 `;
 /** The repositories for the android/build.gradle. */
 function imgly_repos_block(configuration) {
-    var _a, _b;
     return `buildscript {
     repositories {
         maven { url "https://artifactory.img.ly/artifactory/imgly" }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${(_a = configuration === null || configuration === void 0 ? void 0 : configuration.kotlinGradlePluginVersion) !== null && _a !== void 0 ? _a : default_kotlin_version}"
-        classpath 'ly.img.android.sdk:plugin:${(_b = configuration === null || configuration === void 0 ? void 0 : configuration.version) !== null && _b !== void 0 ? _b : sdk_version}'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${configuration?.kotlinGradlePluginVersion ?? default_kotlin_version}"
+        classpath 'ly.img.android.sdk:plugin:${configuration?.version ?? sdk_version}'
     }
 }
 `;

@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -25,13 +29,13 @@ const Helpers = __importStar(require("./helpers"));
 /** Applies all needed native configurations. */
 const withReactNativeIMGLY = (config, { android } = {}) => {
     const configuration = {
-        version: android === null || android === void 0 ? void 0 : android.version,
-        modules: android === null || android === void 0 ? void 0 : android.modules,
-        buildToolsVersion: android === null || android === void 0 ? void 0 : android.buildToolsVersion,
-        minSdkVersion: android === null || android === void 0 ? void 0 : android.minSdkVersion,
-        compileSdkVersion: android === null || android === void 0 ? void 0 : android.compileSdkVersion,
-        targetSdkVersion: android === null || android === void 0 ? void 0 : android.targetSdkVersion,
-        kotlinGradlePluginVersion: android === null || android === void 0 ? void 0 : android.kotlinGradlePluginVersion,
+        version: android?.version,
+        modules: android?.modules,
+        buildToolsVersion: android?.buildToolsVersion,
+        minSdkVersion: android?.minSdkVersion,
+        compileSdkVersion: android?.compileSdkVersion,
+        targetSdkVersion: android?.targetSdkVersion,
+        kotlinGradlePluginVersion: android?.kotlinGradlePluginVersion,
     };
     return (0, config_plugins_1.withPlugins)(config, [
         [withIMGLYGradle, { configuration: configuration }],
@@ -54,7 +58,6 @@ const withIMGLYConfig = (config, { configuration }) => {
 };
 /** Adds the imgly repos in the `android/build.gradle`. */
 function addIMGLYRepos(contents, configuration) {
-    var _a;
     var modifiedContents = contents;
     const repos_tag = Constants.ConfigurationTag.Repos;
     const repos_replacement = Constants.replacementForTag(repos_tag, configuration);
@@ -87,7 +90,7 @@ function addIMGLYRepos(contents, configuration) {
         modifiedContents = versions_tagged_replacement;
     }
     else {
-        const previousContent = (_a = Helpers.previousContent(sdk_versions_tag, contents)) === null || _a === void 0 ? void 0 : _a.replace(/^/gm, "//");
+        const previousContent = Helpers.previousContent(sdk_versions_tag, contents)?.replace(/^/gm, "//");
         if (previousContent != null) {
             const versions_tagged_replacement_block = Helpers.taggedReplacementBlock(sdk_versions_tag, versions_replacement, previousContent);
             if (!contents.match(versions_tagged_replacement_block)) {

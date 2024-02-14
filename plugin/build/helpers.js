@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -63,17 +67,18 @@ exports.previousContent = previousContent;
  * @returns The parsed content if any.
  */
 function parseSDKVersions(content, configurationObject) {
-    var _a, _b, _c, _d;
     let source = previousContent(constants_1.ConfigurationTag.SDKVersions, content);
     if (source != null) {
         const buildToolsRegEx = /\bbuildToolsVersion\s*=\s*"([0-9]*).([0-9]*).([0-9]*)"$/gm;
         const minSdkVersionRegEx = /\bminSdkVersion\s*=\s*([0-9]*)$/gm;
         const compileSdkVersionRegEx = /\bcompileSdkVersion\s*=\s*([0-9]*)$/gm;
         const targetSdkVersionRegEx = /\btargetSdkVersion\s*=\s*([0-9]*)$/gm;
-        const newBuildTools = `buildToolsVersion = "${(_a = configurationObject === null || configurationObject === void 0 ? void 0 : configurationObject.buildToolsVersion) !== null && _a !== void 0 ? _a : Constants.defaultBuildToolsVersion}"`;
-        const newMinSdkVersion = `minSdkVersion = ${(_b = configurationObject === null || configurationObject === void 0 ? void 0 : configurationObject.minSdkVersion) !== null && _b !== void 0 ? _b : Constants.defaultMinSdkVersion}`;
-        const newCompileSdkVersion = `compileSdkVersion = ${(_c = configurationObject === null || configurationObject === void 0 ? void 0 : configurationObject.compileSdkVersion) !== null && _c !== void 0 ? _c : Constants.defaultCompileSdkVersion}`;
-        const newTargetSdkVersion = `targetSdkVersion = ${(_d = configurationObject === null || configurationObject === void 0 ? void 0 : configurationObject.targetSdkVersion) !== null && _d !== void 0 ? _d : Constants.defaultTargetSdkVersion}`;
+        const newBuildTools = `buildToolsVersion = "${configurationObject?.buildToolsVersion ??
+            Constants.defaultBuildToolsVersion}"`;
+        const newMinSdkVersion = `minSdkVersion = ${configurationObject?.minSdkVersion ?? Constants.defaultMinSdkVersion}`;
+        const newCompileSdkVersion = `compileSdkVersion = ${configurationObject?.compileSdkVersion ??
+            Constants.defaultCompileSdkVersion}`;
+        const newTargetSdkVersion = `targetSdkVersion = ${configurationObject?.targetSdkVersion ?? Constants.defaultTargetSdkVersion}`;
         source = source.replace(buildToolsRegEx, newBuildTools);
         source = source.replace(minSdkVersionRegEx, newMinSdkVersion);
         source = source.replace(compileSdkVersionRegEx, newCompileSdkVersion);
