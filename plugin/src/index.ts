@@ -160,7 +160,11 @@ function addIMGLYConfig(
   configuration?: Constants.AndroidConfigurationObject
 ): string {
   const tag = Constants.ConfigurationTag.Modules;
-  const replacement = Constants.replacementForTag(tag, configuration);
+  const depTag = Constants.ConfigurationTag.Dependencies;
+  const replacement = Constants.replacementForTag(tag, configuration).concat(
+    Constants.replacementForTag(depTag, configuration)
+  );
+
   const taggedReplacement = Helpers.replaceTaggedConfiguration(
     contents,
     tag,

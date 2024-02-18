@@ -32,15 +32,16 @@ var ConfigurationTag;
     ConfigurationTag["Repos"] = "REPOS";
     ConfigurationTag["Maven"] = "MAVEN";
     ConfigurationTag["SDKVersions"] = "SDK_VERSIONS";
+    ConfigurationTag["Dependencies"] = "DEPENDENCIES";
 })(ConfigurationTag || (exports.ConfigurationTag = ConfigurationTag = {}));
 /** The default `buildToolsVersion`. */
-exports.defaultBuildToolsVersion = "31.0.0";
+exports.defaultBuildToolsVersion = "34.0.0";
 /** The default `minSdkVersion`. */
-exports.defaultMinSdkVersion = "21";
+exports.defaultMinSdkVersion = "23";
 /** The default `compileSdkVersion`. */
-exports.defaultCompileSdkVersion = "31";
+exports.defaultCompileSdkVersion = "34";
 /** The default `targetSdkVersion`. */
-exports.defaultTargetSdkVersion = "30";
+exports.defaultTargetSdkVersion = "34";
 /**
  * Returns the replacement for a given `ConfigurationTag.`
  * @param tag The `ConfigurationTag`.
@@ -56,6 +57,8 @@ function replacementForTag(tag, configuration, content) {
             return customizedModules(configuration);
         case ConfigurationTag.Repos:
             return imgly_repos_block(configuration);
+        case ConfigurationTag.Dependencies:
+            return imgly_dependencies_block();
         case ConfigurationTag.SDKVersions:
             if (content != null) {
                 return Helpers.parseSDKVersions(content, configuration) ?? "";
@@ -82,9 +85,9 @@ function customizedModules(configuration) {
 /** The modules for the android/app/build.gradle. */
 exports.imgly_config_regex = 'apply plugin: "com.android.application"';
 /** The version of the native Android SDK that is needed for the plugins. */
-const sdk_version = "10.4.1";
+const sdk_version = "10.8.2";
 /** The Kotlin version that is needed for the plugins. */
-const default_kotlin_version = "1.5.32";
+const default_kotlin_version = "1.8.0";
 /** The start for the imgly configuration block. */
 const imgly_config_start = `
 apply plugin: 'ly.img.android.sdk'
@@ -159,5 +162,13 @@ function imgly_repos_block(configuration) {
         classpath 'ly.img.android.sdk:plugin:${configuration?.version ?? sdk_version}'
     }
 }
+`;
+}
+/** The dependencies for the android/build.gradle. */
+function imgly_dependencies_block() {
+    return `    
+    dependencies {
+      implementation('androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0')
+    }
 `;
 }
