@@ -7,7 +7,7 @@
   "scripts": {
     "build": "expo-module build plugin",
     "clean": "expo-module clean plugin",
-    "prepare": "yarn clean && yarn build"
+    "prep": "yarn clean && yarn build"
   },
   "homepage": "https://www.img.ly",
   "keywords": [
@@ -39,9 +39,9 @@
   "licenseFilename": "LICENSE.md",
   "readmeFilename": "README.md",
   "devDependencies": {
-    "expo-module-scripts": "^2.0.0"
+    "expo-module-scripts": "^3.4.1"
   },
   "dependencies": {
-    "@expo/config-plugins": "^4.0.9"
+    "@expo/config-plugins": "~7.2.0"
   }
 }
