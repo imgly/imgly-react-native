@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -28,15 +32,15 @@ var ConfigurationTag;
     ConfigurationTag["Repos"] = "REPOS";
     ConfigurationTag["Maven"] = "MAVEN";
     ConfigurationTag["SDKVersions"] = "SDK_VERSIONS";
-})(ConfigurationTag = exports.ConfigurationTag || (exports.ConfigurationTag = {}));
+})(ConfigurationTag || (exports.ConfigurationTag = ConfigurationTag = {}));
 /** The default `buildToolsVersion`. */
-exports.defaultBuildToolsVersion = "31.0.0";
+exports.defaultBuildToolsVersion = "34.0.0";
 /** The default `minSdkVersion`. */
 exports.defaultMinSdkVersion = "21";
 /** The default `compileSdkVersion`. */
-exports.defaultCompileSdkVersion = "31";
+exports.defaultCompileSdkVersion = "34";
 /** The default `targetSdkVersion`. */
-exports.defaultTargetSdkVersion = "30";
+exports.defaultTargetSdkVersion = "34";
 /**
  * Returns the replacement for a given `ConfigurationTag.`
  * @param tag The `ConfigurationTag`.
@@ -45,7 +49,6 @@ exports.defaultTargetSdkVersion = "30";
  * @returns The replacement string.
  */
 function replacementForTag(tag, configuration, content) {
-    var _a;
     switch (tag) {
         case ConfigurationTag.Maven:
             return imgly_allprojects_block;
@@ -55,7 +58,7 @@ function replacementForTag(tag, configuration, content) {
             return imgly_repos_block(configuration);
         case ConfigurationTag.SDKVersions:
             if (content != null) {
-                return (_a = Helpers.parseSDKVersions(content, configuration)) !== null && _a !== void 0 ? _a : "";
+                return Helpers.parseSDKVersions(content, configuration) ?? "";
             }
             return "";
     }
@@ -67,7 +70,7 @@ exports.replacementForTag = replacementForTag;
  * @returns The parsed string.
  */
 function customizedModules(configuration) {
-    if ((configuration === null || configuration === void 0 ? void 0 : configuration.modules) != null) {
+    if (configuration?.modules != null) {
         var modules = configuration.modules.flatMap((module) => `        include '${module}'\n`);
         var config = imgly_config_start.concat(...modules, imgly_config_end);
         return config;
@@ -79,9 +82,11 @@ function customizedModules(configuration) {
 /** The modules for the android/app/build.gradle. */
 exports.imgly_config_regex = 'apply plugin: "com.android.application"';
 /** The version of the native Android SDK that is needed for the plugins. */
-const sdk_version = "10.4.1";
+const sdk_version = "10.9.0";
 /** The Kotlin version that is needed for the plugins. */
-const default_kotlin_version = "1.5.32";
+const default_kotlin_version = "1.8.0";
+/** The KSP version that is needed for the plugins. */
+const default_ksp_version = "1.8.0-1.0.9";
 /** The start for the imgly configuration block. */
 const imgly_config_start = `
 apply plugin: 'ly.img.android.sdk'
@@ -101,7 +106,7 @@ apply plugin: 'ly.img.android.sdk'
 apply plugin: 'kotlin-android'
 
 // Comment out the modules you don't need, to save size.
-imglyConfig {
+IMGLY.configure {
     modules {
         include 'ui:text'
         include 'ui:focus'
@@ -147,14 +152,16 @@ allprojects {
 `;
 /** The repositories for the android/build.gradle. */
 function imgly_repos_block(configuration) {
-    var _a, _b;
+    const kotlinVers = configuration?.kotlinGradlePluginVersion ?? default_kotlin_version;
     return `buildscript {
     repositories {
         maven { url "https://artifactory.img.ly/artifactory/imgly" }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${(_a = configuration === null || configuration === void 0 ? void 0 : configuration.kotlinGradlePluginVersion) !== null && _a !== void 0 ? _a : default_kotlin_version}"
-        classpath 'ly.img.android.sdk:plugin:${(_b = configuration === null || configuration === void 0 ? void 0 : configuration.version) !== null && _b !== void 0 ? _b : sdk_version}'
+        def kotlinVersion = findProperty('android.kotlinVersion') ?: "${kotlinVers}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$\{kotlinVersion}"
+        classpath 'ly.img.android.sdk:plugin:${configuration?.version ?? sdk_version}'
+        classpath('com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${configuration?.kspVersion ?? default_ksp_version}')
     }
 }
 `;

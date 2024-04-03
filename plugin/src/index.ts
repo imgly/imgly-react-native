@@ -1,9 +1,8 @@
 import {
   ConfigPlugin,
   withAppBuildGradle,
-  withProjectBuildGradle,
-  withMainApplication,
   withPlugins,
+  withProjectBuildGradle,
 } from "@expo/config-plugins";
 
 import * as Constants from "./constants";
@@ -20,6 +19,7 @@ const withReactNativeIMGLY: ConfigPlugin<
       compileSdkVersion?: string;
       targetSdkVersion?: string;
       kotlinGradlePluginVersion?: string;
+      kspVersion?: string;
     };
   } | void
 > = (config, { android } = {}) => {
@@ -31,6 +31,7 @@ const withReactNativeIMGLY: ConfigPlugin<
     compileSdkVersion: android?.compileSdkVersion,
     targetSdkVersion: android?.targetSdkVersion,
     kotlinGradlePluginVersion: android?.kotlinGradlePluginVersion,
+    kspVersion: android?.kspVersion,
   };
   return withPlugins(config, [
     [withIMGLYGradle, { configuration: configuration }],
@@ -182,7 +183,7 @@ function addIMGLYConfig(
         );
       }
       throw new Error(
-        'Unable to configure img.ly plugins: Plugin "com.android.application" not found.'
+        'Unable to configure IMG.LY plugins: Plugin "com.android.application" not found.'
       );
     }
     return contents;

@@ -22,6 +22,9 @@ export interface AndroidConfigurationObject {
 
   /** The Kotlin Gradle plugin version used. */
   kotlinGradlePluginVersion?: string;
+
+  /** The KSP version used. */
+  kspVersion?: string;
 }
 
 /** Tags for the config plugin. */
@@ -33,16 +36,16 @@ export enum ConfigurationTag {
 }
 
 /** The default `buildToolsVersion`. */
-export const defaultBuildToolsVersion = "31.0.0";
+export const defaultBuildToolsVersion = "34.0.0";
 
 /** The default `minSdkVersion`. */
 export const defaultMinSdkVersion = "21";
 
 /** The default `compileSdkVersion`. */
-export const defaultCompileSdkVersion = "31";
+export const defaultCompileSdkVersion = "34";
 
 /** The default `targetSdkVersion`. */
-export const defaultTargetSdkVersion = "30";
+export const defaultTargetSdkVersion = "34";
 
 /**
  * Returns the replacement for a given `ConfigurationTag.`
@@ -92,10 +95,13 @@ function customizedModules(configuration?: AndroidConfigurationObject): string {
 export const imgly_config_regex = 'apply plugin: "com.android.application"';
 
 /** The version of the native Android SDK that is needed for the plugins. */
-const sdk_version = "10.4.1";
+const sdk_version = "10.9.0";
 
 /** The Kotlin version that is needed for the plugins. */
-const default_kotlin_version = "1.5.32";
+const default_kotlin_version = "1.8.0";
+
+/** The KSP version that is needed for the plugins. */
+const default_ksp_version = "1.8.0-1.0.9";
 
 /** The start for the imgly configuration block. */
 const imgly_config_start = `
@@ -118,7 +124,7 @@ apply plugin: 'ly.img.android.sdk'
 apply plugin: 'kotlin-android'
 
 // Comment out the modules you don't need, to save size.
-imglyConfig {
+IMGLY.configure {
     modules {
         include 'ui:text'
         include 'ui:focus'
@@ -166,17 +172,20 @@ allprojects {
 
 /** The repositories for the android/build.gradle. */
 function imgly_repos_block(configuration?: AndroidConfigurationObject): string {
+  const kotlinVers = configuration?.kotlinGradlePluginVersion ?? default_kotlin_version
   return `buildscript {
     repositories {
         maven { url "https://artifactory.img.ly/artifactory/imgly" }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${
-          configuration?.kotlinGradlePluginVersion ?? default_kotlin_version
-        }"
+        def kotlinVersion = findProperty('android.kotlinVersion') ?: "${kotlinVers}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$\{kotlinVersion}"
         classpath 'ly.img.android.sdk:plugin:${
           configuration?.version ?? sdk_version
         }'
+        classpath('com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${
+          configuration?.kspVersion ?? default_ksp_version
+        }')
     }
 }
 `;

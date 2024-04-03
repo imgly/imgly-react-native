@@ -9,6 +9,7 @@ declare const withReactNativeIMGLY: ConfigPlugin<{
         compileSdkVersion?: string;
         targetSdkVersion?: string;
         kotlinGradlePluginVersion?: string;
+        kspVersion?: string;
     };
 } | void>;
 export default withReactNativeIMGLY;

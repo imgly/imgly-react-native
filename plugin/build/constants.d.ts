@@ -14,6 +14,8 @@ export interface AndroidConfigurationObject {
     targetSdkVersion?: string;
     /** The Kotlin Gradle plugin version used. */
     kotlinGradlePluginVersion?: string;
+    /** The KSP version used. */
+    kspVersion?: string;
 }
 /** Tags for the config plugin. */
 export declare enum ConfigurationTag {
@@ -23,13 +25,13 @@ export declare enum ConfigurationTag {
     SDKVersions = "SDK_VERSIONS"
 }
 /** The default `buildToolsVersion`. */
-export declare const defaultBuildToolsVersion = "31.0.0";
+export declare const defaultBuildToolsVersion = "34.0.0";
 /** The default `minSdkVersion`. */
 export declare const defaultMinSdkVersion = "21";
 /** The default `compileSdkVersion`. */
-export declare const defaultCompileSdkVersion = "31";
+export declare const defaultCompileSdkVersion = "34";
 /** The default `targetSdkVersion`. */
-export declare const defaultTargetSdkVersion = "30";
+export declare const defaultTargetSdkVersion = "34";
 /**
  * Returns the replacement for a given `ConfigurationTag.`
  * @param tag The `ConfigurationTag`.
