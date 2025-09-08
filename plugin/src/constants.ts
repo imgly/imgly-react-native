@@ -36,16 +36,16 @@ export enum ConfigurationTag {
 }
 
 /** The default `buildToolsVersion`. */
-export const defaultBuildToolsVersion = "34.0.0";
+export const defaultBuildToolsVersion = "35.0.0";
 
 /** The default `minSdkVersion`. */
 export const defaultMinSdkVersion = "21";
 
 /** The default `compileSdkVersion`. */
-export const defaultCompileSdkVersion = "34";
+export const defaultCompileSdkVersion = "35";
 
 /** The default `targetSdkVersion`. */
-export const defaultTargetSdkVersion = "34";
+export const defaultTargetSdkVersion = "35";
 
 /**
  * Returns the replacement for a given `ConfigurationTag.`
@@ -98,10 +98,10 @@ export const imgly_config_regex = 'apply plugin: "com.android.application"';
 const sdk_version = "10.9.0";
 
 /** The Kotlin version that is needed for the plugins. */
-const default_kotlin_version = "1.8.0";
+const default_kotlin_version = "2.1.0";
 
 /** The KSP version that is needed for the plugins. */
-const default_ksp_version = "1.8.0-1.0.9";
+const default_ksp_version = "2.1.0-1.0.28";
 
 /** The start for the imgly configuration block. */
 const imgly_config_start = `

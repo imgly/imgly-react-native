@@ -59,7 +59,7 @@ In order to use this module with the Expo CLI you can make use of our integrated
              "minSdkVersion": "21",
              "compileSdkVersion": "31",
              "targetSdkVersion": "30",
-             "kotlinGradlePluginVersion": "1.5.32"
+             "kotlinGradlePluginVersion": "2.1.0"
            }
          }
        ]

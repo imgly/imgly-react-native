@@ -25,13 +25,13 @@ export declare enum ConfigurationTag {
     SDKVersions = "SDK_VERSIONS"
 }
 /** The default `buildToolsVersion`. */
-export declare const defaultBuildToolsVersion = "34.0.0";
+export declare const defaultBuildToolsVersion = "35.0.0";
 /** The default `minSdkVersion`. */
 export declare const defaultMinSdkVersion = "21";
 /** The default `compileSdkVersion`. */
-export declare const defaultCompileSdkVersion = "34";
+export declare const defaultCompileSdkVersion = "35";
 /** The default `targetSdkVersion`. */
-export declare const defaultTargetSdkVersion = "34";
+export declare const defaultTargetSdkVersion = "35";
 /**
  * Returns the replacement for a given `ConfigurationTag.`
  * @param tag The `ConfigurationTag`.

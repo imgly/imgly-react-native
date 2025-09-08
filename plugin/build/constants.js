@@ -34,13 +34,13 @@ var ConfigurationTag;
     ConfigurationTag["SDKVersions"] = "SDK_VERSIONS";
 })(ConfigurationTag || (exports.ConfigurationTag = ConfigurationTag = {}));
 /** The default `buildToolsVersion`. */
-exports.defaultBuildToolsVersion = "34.0.0";
+exports.defaultBuildToolsVersion = "35.0.0";
 /** The default `minSdkVersion`. */
 exports.defaultMinSdkVersion = "21";
 /** The default `compileSdkVersion`. */
-exports.defaultCompileSdkVersion = "34";
+exports.defaultCompileSdkVersion = "35";
 /** The default `targetSdkVersion`. */
-exports.defaultTargetSdkVersion = "34";
+exports.defaultTargetSdkVersion = "35";
 /**
  * Returns the replacement for a given `ConfigurationTag.`
  * @param tag The `ConfigurationTag`.
@@ -84,9 +84,9 @@ exports.imgly_config_regex = 'apply plugin: "com.android.application"';
 /** The version of the native Android SDK that is needed for the plugins. */
 const sdk_version = "10.9.0";
 /** The Kotlin version that is needed for the plugins. */
-const default_kotlin_version = "1.8.0";
+const default_kotlin_version = "2.1.0";
 /** The KSP version that is needed for the plugins. */
-const default_ksp_version = "1.8.0-1.0.9";
+const default_ksp_version = "2.1.0-1.0.28";
 /** The start for the imgly configuration block. */
 const imgly_config_start = `
 apply plugin: 'ly.img.android.sdk'
