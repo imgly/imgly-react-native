@@ -24,6 +24,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_plugins_1 = require("@expo/config-plugins");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 const Constants = __importStar(require("./constants"));
 const Helpers = __importStar(require("./helpers"));
 /** Applies all needed native configurations. */
@@ -41,6 +43,7 @@ const withReactNativeIMGLY = (config, { android } = {}) => {
     return (0, config_plugins_1.withPlugins)(config, [
         [withIMGLYGradle, { configuration: configuration }],
         [withIMGLYConfig, { configuration: configuration }],
+        [withIMGLYGradleProperties, { configuration: configuration }],
     ]);
 };
 /** Adds the imgly repos in the `android/build.gradle`. */
@@ -57,6 +60,69 @@ const withIMGLYConfig = (config, { configuration }) => {
         return config;
     });
 };
+/** Updates modern Android Gradle properties used by recent Expo templates. */
+const withIMGLYGradleProperties = (config, { configuration }) => {
+    return (0, config_plugins_1.withGradleProperties)(config, (config) => {
+        config.modResults = addIMGLYGradleProperties(config.modResults, configuration, config.modRequest.projectRoot);
+        return config;
+    });
+};
+/** Returns a version from the React Native version catalog if available. */
+function versionCatalogValue(projectRoot, key) {
+    const versionCatalogPath = path.join(projectRoot, "node_modules", "react-native", "gradle", "libs.versions.toml");
+    if (!fs.existsSync(versionCatalogPath)) {
+        return;
+    }
+    const versionCatalog = fs.readFileSync(versionCatalogPath, "utf8");
+    const match = versionCatalog.match(new RegExp(`^${key}\\s*=\\s*"([^"]+)"$`, "m"));
+    if (match == null) {
+        return;
+    }
+    return match[1];
+}
+/** Adds or updates a Gradle property in `android/gradle.properties`. */
+function upsertGradleProperty(properties, key, value, overwrite = true) {
+    const previousProperty = properties.find((property) => property.type === "property" && property.key === key);
+    if (previousProperty != null) {
+        if (overwrite) {
+            previousProperty.value = value;
+        }
+        return properties;
+    }
+    properties.push({
+        type: "property",
+        key,
+        value,
+    });
+    return properties;
+}
+/** Adds Expo specific Gradle properties for modern Android templates. */
+function addIMGLYGradleProperties(properties, configuration, projectRoot) {
+    const detectedKotlinVersion = projectRoot != null ? versionCatalogValue(projectRoot, "kotlin") : undefined;
+    const effectiveKotlinVersion = configuration?.kotlinGradlePluginVersion ?? detectedKotlinVersion;
+    const effectiveKspVersion = configuration?.kspVersion ??
+        Constants.kspVersionForKotlinVersion(effectiveKotlinVersion);
+    if (configuration?.buildToolsVersion != null) {
+        upsertGradleProperty(properties, "android.buildToolsVersion", configuration.buildToolsVersion);
+    }
+    if (configuration?.minSdkVersion != null) {
+        upsertGradleProperty(properties, "android.minSdkVersion", configuration.minSdkVersion);
+    }
+    if (configuration?.compileSdkVersion != null) {
+        upsertGradleProperty(properties, "android.compileSdkVersion", configuration.compileSdkVersion);
+    }
+    if (configuration?.targetSdkVersion != null) {
+        upsertGradleProperty(properties, "android.targetSdkVersion", configuration.targetSdkVersion);
+    }
+    if (effectiveKotlinVersion != null) {
+        upsertGradleProperty(properties, "android.kotlinVersion", effectiveKotlinVersion, configuration?.kotlinGradlePluginVersion != null);
+    }
+    if (effectiveKspVersion != null) {
+        upsertGradleProperty(properties, "android.kspVersion", effectiveKspVersion, configuration?.kspVersion != null ||
+            configuration?.kotlinGradlePluginVersion != null);
+    }
+    return properties;
+}
 /** Adds the imgly repos in the `android/build.gradle`. */
 function addIMGLYRepos(contents, configuration) {
     var modifiedContents = contents;

@@ -32,6 +32,14 @@ export declare const defaultMinSdkVersion = "21";
 export declare const defaultCompileSdkVersion = "35";
 /** The default `targetSdkVersion`. */
 export declare const defaultTargetSdkVersion = "35";
+/** Known Kotlin to KSP version mappings. */
+export declare const kspVersionLookup: Record<string, string>;
+/**
+ * Returns the matching KSP version for the given Kotlin version if it is known.
+ * @param kotlinVersion The Kotlin version.
+ * @returns The matching KSP version if available.
+ */
+export declare function kspVersionForKotlinVersion(kotlinVersion?: string): string | undefined;
 /**
  * Returns the replacement for a given `ConfigurationTag.`
  * @param tag The `ConfigurationTag`.

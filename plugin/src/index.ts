@@ -1,12 +1,29 @@
 import {
   ConfigPlugin,
   withAppBuildGradle,
+  withGradleProperties,
   withPlugins,
   withProjectBuildGradle,
 } from "@expo/config-plugins";
+import * as fs from "fs";
+import * as path from "path";
 
 import * as Constants from "./constants";
 import * as Helpers from "./helpers";
+
+type GradlePropertyItem =
+  | {
+      type: "comment";
+      value: string;
+    }
+  | {
+      type: "empty";
+    }
+  | {
+      type: "property";
+      key: string;
+      value: string;
+    };
 
 /** Applies all needed native configurations. */
 const withReactNativeIMGLY: ConfigPlugin<
@@ -36,6 +53,7 @@ const withReactNativeIMGLY: ConfigPlugin<
   return withPlugins(config, [
     [withIMGLYGradle, { configuration: configuration }],
     [withIMGLYConfig, { configuration: configuration }],
+    [withIMGLYGradleProperties, { configuration: configuration }],
   ]);
 };
 
@@ -64,6 +82,141 @@ const withIMGLYConfig: ConfigPlugin<{
     return config;
   });
 };
+
+/** Updates modern Android Gradle properties used by recent Expo templates. */
+const withIMGLYGradleProperties: ConfigPlugin<{
+  configuration?: Constants.AndroidConfigurationObject;
+}> = (config, { configuration }) => {
+  return withGradleProperties(config, (config) => {
+    config.modResults = addIMGLYGradleProperties(
+      config.modResults,
+      configuration,
+      config.modRequest.projectRoot
+    );
+    return config;
+  });
+};
+
+/** Returns a version from the React Native version catalog if available. */
+function versionCatalogValue(
+  projectRoot: string,
+  key: string
+): string | undefined {
+  const versionCatalogPath = path.join(
+    projectRoot,
+    "node_modules",
+    "react-native",
+    "gradle",
+    "libs.versions.toml"
+  );
+
+  if (!fs.existsSync(versionCatalogPath)) {
+    return;
+  }
+
+  const versionCatalog = fs.readFileSync(versionCatalogPath, "utf8");
+  const match = versionCatalog.match(
+    new RegExp(`^${key}\\s*=\\s*"([^"]+)"$`, "m")
+  );
+
+  if (match == null) {
+    return;
+  }
+
+  return match[1];
+}
+
+/** Adds or updates a Gradle property in `android/gradle.properties`. */
+function upsertGradleProperty(
+  properties: GradlePropertyItem[],
+  key: string,
+  value: string,
+  overwrite = true
+): GradlePropertyItem[] {
+  const previousProperty = properties.find(
+    (
+      property
+    ): property is Extract<GradlePropertyItem, { type: "property" }> =>
+      property.type === "property" && property.key === key
+  );
+
+  if (previousProperty != null) {
+    if (overwrite) {
+      previousProperty.value = value;
+    }
+    return properties;
+  }
+
+  properties.push({
+    type: "property",
+    key,
+    value,
+  });
+  return properties;
+}
+
+/** Adds Expo specific Gradle properties for modern Android templates. */
+function addIMGLYGradleProperties(
+  properties: GradlePropertyItem[],
+  configuration?: Constants.AndroidConfigurationObject,
+  projectRoot?: string
+): GradlePropertyItem[] {
+  const detectedKotlinVersion =
+    projectRoot != null ? versionCatalogValue(projectRoot, "kotlin") : undefined;
+  const effectiveKotlinVersion =
+    configuration?.kotlinGradlePluginVersion ?? detectedKotlinVersion;
+  const effectiveKspVersion =
+    configuration?.kspVersion ??
+    Constants.kspVersionForKotlinVersion(effectiveKotlinVersion);
+
+  if (configuration?.buildToolsVersion != null) {
+    upsertGradleProperty(
+      properties,
+      "android.buildToolsVersion",
+      configuration.buildToolsVersion
+    );
+  }
+  if (configuration?.minSdkVersion != null) {
+    upsertGradleProperty(
+      properties,
+      "android.minSdkVersion",
+      configuration.minSdkVersion
+    );
+  }
+  if (configuration?.compileSdkVersion != null) {
+    upsertGradleProperty(
+      properties,
+      "android.compileSdkVersion",
+      configuration.compileSdkVersion
+    );
+  }
+  if (configuration?.targetSdkVersion != null) {
+    upsertGradleProperty(
+      properties,
+      "android.targetSdkVersion",
+      configuration.targetSdkVersion
+    );
+  }
+  if (effectiveKotlinVersion != null) {
+    upsertGradleProperty(
+      properties,
+      "android.kotlinVersion",
+      effectiveKotlinVersion,
+      configuration?.kotlinGradlePluginVersion != null
+    );
+  }
+  if (effectiveKspVersion != null) {
+    upsertGradleProperty(
+      properties,
+      "android.kspVersion",
+      effectiveKspVersion,
+      configuration?.kspVersion != null ||
+        configuration?.kotlinGradlePluginVersion != null
+    );
+  }
+
+  return properties;
+}
 
 /** Adds the imgly repos in the `android/build.gradle`. */
 function addIMGLYRepos(

@@ -1,3 +1,15 @@
+## [3.4.2]
+
+### Fixed
+
+* [react-native-imglysdk] Fixed the Expo config plugin to align Kotlin/KSP defaults with modern Expo Android projects while keeping the legacy Gradle path compatible.
+* [react-native-photoeditorsdk] Fixed Android compatibility with newer React Native versions where `currentActivity` is no longer exposed as a Kotlin property.
+* [react-native-videoeditorsdk] Fixed Android compatibility with newer React Native versions where `currentActivity` is no longer exposed as a Kotlin property.
+
+### Changed
+
+* Updated the ExpoTest app to Expo SDK 55.
+
 ## [3.4.0]
 
 ### Changed

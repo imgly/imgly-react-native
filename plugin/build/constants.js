@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.imgly_config_regex = exports.replacementForTag = exports.defaultTargetSdkVersion = exports.defaultCompileSdkVersion = exports.defaultMinSdkVersion = exports.defaultBuildToolsVersion = exports.ConfigurationTag = void 0;
+exports.imgly_config_regex = exports.replacementForTag = exports.kspVersionForKotlinVersion = exports.kspVersionLookup = exports.defaultTargetSdkVersion = exports.defaultCompileSdkVersion = exports.defaultMinSdkVersion = exports.defaultBuildToolsVersion = exports.ConfigurationTag = void 0;
 const Helpers = __importStar(require("./helpers"));
 /** Tags for the config plugin. */
 var ConfigurationTag;
@@ -41,6 +41,34 @@ exports.defaultMinSdkVersion = "21";
 exports.defaultCompileSdkVersion = "35";
 /** The default `targetSdkVersion`. */
 exports.defaultTargetSdkVersion = "35";
+/** Known Kotlin to KSP version mappings. */
+exports.kspVersionLookup = {
+    "2.2.20": "2.2.20-2.0.3",
+    "2.2.10": "2.2.10-2.0.2",
+    "2.2.0": "2.2.0-2.0.2",
+    "2.1.21": "2.1.21-2.0.2",
+    "2.1.20": "2.1.20-2.0.1",
+    "2.1.10": "2.1.10-1.0.31",
+    "2.1.0": "2.1.0-1.0.29",
+    "2.0.21": "2.0.21-1.0.28",
+    "2.0.20": "2.0.20-1.0.25",
+    "2.0.10": "2.0.10-1.0.24",
+    "2.0.0": "2.0.0-1.0.24",
+    "1.8.10": "1.8.10-1.0.9",
+    "1.8.0": "1.8.0-1.0.9",
+};
+/**
+ * Returns the matching KSP version for the given Kotlin version if it is known.
+ * @param kotlinVersion The Kotlin version.
+ * @returns The matching KSP version if available.
+ */
+function kspVersionForKotlinVersion(kotlinVersion) {
+    if (kotlinVersion == null) {
+        return;
+    }
+    return exports.kspVersionLookup[kotlinVersion];
+}
+exports.kspVersionForKotlinVersion = kspVersionForKotlinVersion;
 /**
  * Returns the replacement for a given `ConfigurationTag.`
  * @param tag The `ConfigurationTag`.
@@ -86,7 +114,7 @@ const sdk_version = "10.9.0";
 /** The Kotlin version that is needed for the plugins. */
 const default_kotlin_version = "2.1.0";
 /** The KSP version that is needed for the plugins. */
-const default_ksp_version = "2.1.0-1.0.28";
+const default_ksp_version = "2.1.0-1.0.29";
 /** The start for the imgly configuration block. */
 const imgly_config_start = `
 apply plugin: 'ly.img.android.sdk'
@@ -153,15 +181,19 @@ allprojects {
 /** The repositories for the android/build.gradle. */
 function imgly_repos_block(configuration) {
     const kotlinVers = configuration?.kotlinGradlePluginVersion ?? default_kotlin_version;
+    const kspVers = configuration?.kspVersion ??
+        kspVersionForKotlinVersion(configuration?.kotlinGradlePluginVersion) ??
+        default_ksp_version;
     return `buildscript {
     repositories {
         maven { url "https://artifactory.img.ly/artifactory/imgly" }
     }
     dependencies {
         def kotlinVersion = findProperty('android.kotlinVersion') ?: "${kotlinVers}"
+        def kspVersion = findProperty('android.kspVersion') ?: "${kspVers}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$\{kotlinVersion}"
         classpath 'ly.img.android.sdk:plugin:${configuration?.version ?? sdk_version}'
-        classpath('com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${configuration?.kspVersion ?? default_ksp_version}')
+        classpath "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:$\{kspVersion}"
     }
 }
 `;
